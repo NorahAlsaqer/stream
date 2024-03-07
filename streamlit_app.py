@@ -10,7 +10,7 @@ st.title("🎧 MOM's 📝")
 st.write("(https://huggingface.co/Pontonkid)")
 
 st.sidebar.title("Audio Analysis")
-st.sidebar.write("The Audio Analysis app is a powerful tool that allows you to analyze audio files and gain valuable insights from them. It combines speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
+st.sidebar.write(" speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
 
 st.sidebar.header("Upload Audio")
 audio_file = st.sidebar.file_uploader("Browse", type=["wav"])
