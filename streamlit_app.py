@@ -1,33 +1,90 @@
+import os
+import traceback
+import streamlit as st
+import speech_recognition as sr
+from transformers import pipeline
+
+st.set_page_config(layout="wide")
+
+st.title("🎧 Audio Analysis 📝")
+st.write("(https://huggingface.co/Pontonkid)")
+
+st.sidebar.title("Audio Analysis")
+st.sidebar.write("The Audio Analysis app is a powerful tool that allows you to analyze audio files and gain valuable insights from them. It combines speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
+
+st.sidebar.header("Upload Audio")
+audio_file = st.sidebar.file_uploader("Browse", type=["wav"])
+upload_button = st.sidebar.button("Upload")
+
+st.sidebar.header("Upload Audio")
+audio_file = st.sidebar.file_uploader("Browse", type=["wav"])
+upload_button = st.sidebar.button("Upload")
+
+def perform_sentiment_analysis(text):
+  model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+
+def perform_sentiment_analysis(text):
+  model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+  sentiment_analysis = pipeline("sentiment-analysis", model=model_name)
+
+def perform_sentiment_analysis(text):
+  model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+  sentiment_analysis = pipeline("sentiment-analysis", model=model_name)
+  results = sentiment_analysis(text)
+
+def perform_sentiment_analysis(text):
+  model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+  sentiment_analysis = pipeline("sentiment-analysis", model=model_name)
+  results = sentiment_analysis(text)
+  sentiment_label = results[0]['label']
+  sentiment_score = results[0]['score']
+  return sentiment_label, sentiment_score
+
+
+def transcribe_audio(audio_file):
+  r = sr.Recognizer()
+  with sr.AudioFile(audio_file) as source:
+    audio = r.record(source)
+    transcribed_text = r.recognize_google(audio)
+  return transcribed_text
+
 def main():
-    audio_file = st.sidebar.file_uploader("Browse", type=["wav", "mp3"])
-    upload_button = st.sidebar.button("Upload")
+  if audio_file and upload_button:
+    try:
+      transcribed_text = transcribe_audio(audio_file)
+      sentiment_label, sentiment_score = perform_sentiment_analysis(transcribed_text)
 
-    if upload_button:
-        if audio_file is not None:
-            try:
-                temp_audio_path = "temp_audio.wav"
-                with open(temp_audio_path, "wb") as f:
-                    f.write(audio_file.read())
+st.header("Transcribed Text")
+st.text_area("Transcribed Text", transcribed_text, height=200)
+st.header("Sentiment Analysis")
+negative_icon = "👎"
+neutral_icon = "😐"
+positive_icon = "👍"
 
-                transcribed_text = transcribe_audio_with_retry(temp_audio_path)
-                sentiment_label, sentiment_score = perform_sentiment_analysis(transcribed_text)
+if sentiment_label == "NEGATIVE":
+  st.write(f"{negative_icon} Negative (Score: {sentiment_score})", unsafe_allow_html=True)
+else:
+  st.empty()
 
-                st.header("Transcribed Text")
-                st.text_area("Transcribed Text", transcribed_text, height=200)
-                st.header("Sentiment Analysis")
-                # ... (rest of your code)
+if sentiment_label == "NEUTRAL":
+  st.write(f"{neutral_icon} Neutral (Score: {sentiment_score})", unsafe_allow_html=True)
+else:
+  st.empty()
 
-            except Exception as ex:
-                st.error("Error occurred during audio transcription and sentiment analysis.")
-                st.error(str(ex))
-                traceback.print_exc()
+if sentiment_label == "POSITIVE":
+  st.write(f"{positive_icon} Positive (Score: {sentiment_score})", unsafe_allow_html=True)
+else:
+  st.empty()
 
-            finally:
-                os.remove(temp_audio_path)
-        else:
-            st.warning("Please upload an audio file.")
-    else:
-        st.warning("Click the 'Upload' button to upload an audio file.")
+st.info(
+  "The sentiment score measures how strongly positive, negative, or neutral the feelings or opinions are."
+  "A higher score indicates a positive sentiment, while a lower score indicates a negative sentiment."
+)
 
-if __name__ == "__main__":
-    main()
+except Exception as ex:
+  st.error("Error occurred during audio transcription and sentiment analysis.")
+  st.error(str(ex))
+  traceback.print_exc()
+
+if __name__ == "__main__": main()
+
