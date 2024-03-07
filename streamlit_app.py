@@ -24,9 +24,9 @@ def perform_sentiment_analysis(text):
     sentiment_score = results[0]['score']
     return sentiment_label, sentiment_score
 
-def transcribe_audio(audio_file):
+def transcribe_audio(audio_file_path):
     r = sr.Recognizer()
-    with sr.AudioFile(audio_file) as source:
+    with sr.AudioFile(audio_file_path) as source:
         audio = r.record(source)
         transcribed_text = r.recognize_google(audio)
     return transcribed_text
@@ -34,7 +34,12 @@ def transcribe_audio(audio_file):
 def main():
     if audio_file and upload_button:
         try:
-            transcribed_text = transcribe_audio(audio_file)
+            # Save uploaded file temporarily to disk
+            temp_audio_path = "temp_audio.wav"
+            with open(temp_audio_path, "wb") as f:
+                f.write(audio_file.read())
+
+            transcribed_text = transcribe_audio(temp_audio_path)
             sentiment_label, sentiment_score = perform_sentiment_analysis(transcribed_text)
 
             st.header("Transcribed Text")
@@ -68,6 +73,10 @@ def main():
             st.error("Error occurred during audio transcription and sentiment analysis.")
             st.error(str(ex))
             traceback.print_exc()
+
+        finally:
+            # Remove the temporary file
+            os.remove(temp_audio_path)
 
 if __name__ == "__main__":
     main()
