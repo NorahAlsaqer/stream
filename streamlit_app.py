@@ -6,8 +6,8 @@ from transformers import pipeline
 
 st.set_page_config(layout="wide")
 
-st.title("🎧 Audio Analysis 📝")
-st.write("[Joas](https://huggingface.co/Pontonkid)")
+st.title("🎧 MOM's 📝")
+st.write("(https://huggingface.co/Pontonkid)")
 
 st.sidebar.title("Audio Analysis")
 st.sidebar.write("The Audio Analysis app is a powerful tool that allows you to analyze audio files and gain valuable insights from them. It combines speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
