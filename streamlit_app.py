@@ -13,7 +13,7 @@ st.sidebar.title("Audio Analysis")
 st.sidebar.write(" speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
 
 st.sidebar.header("Upload Audio")
-audio_file = st.sidebar.file_uploader("Browse", type=["wav"])
+audio_file = st.sidebar.file_uploader("Browse", type=["wav", "mp3"])
 upload_button = st.sidebar.button("Upload")
 
 def perform_sentiment_analysis(text):
