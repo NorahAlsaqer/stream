@@ -1,0 +1,3 @@
+!pip install SpeechRecognition
+!pip install streamlit
+!pip install git+https://github.com/huggingface/transformers
