@@ -1,6 +1,9 @@
 def main():
+    audio_file = st.sidebar.file_uploader("Browse", type=["wav", "mp3"])
+    upload_button = st.sidebar.button("Upload")
+
     if upload_button:
-        if audio_file:
+        if audio_file is not None:
             try:
                 temp_audio_path = "temp_audio.wav"
                 with open(temp_audio_path, "wb") as f:
