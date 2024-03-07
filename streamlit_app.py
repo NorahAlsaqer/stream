@@ -1,73 +1,32 @@
-import os
-import traceback
-import streamlit as st
-import speech_recognition as sr
-from transformers import pipeline
+import time
 
-st.set_page_config(layout="wide")
+def transcribe_audio_with_retry(audio_file_path, max_retries=3, delay_seconds=2):
+    for attempt in range(1, max_retries + 1):
+        try:
+            print(f"Attempting transcription (Attempt {attempt} of {max_retries})...")
+            transcribed_text = transcribe_audio(audio_file_path)
+            return transcribed_text
+        except Exception as ex:
+            print(f"Error: {str(ex)}")
+            print(f"Retrying in {delay_seconds} seconds...")
+            time.sleep(delay_seconds)
 
-st.title("🎧 MOM's 📝")
-st.write("(https://huggingface.co/Pontonkid)")
-
-st.sidebar.title("Audio Analysis")
-st.sidebar.write(" speech recognition and sentiment analysis techniques to transcribe the audio and determine the sentiment expressed within it.")
-
-st.sidebar.header("Upload Audio")
-audio_file = st.sidebar.file_uploader("Browse", type=["wav", "mp3"])
-upload_button = st.sidebar.button("Upload")
-
-def perform_sentiment_analysis(text):
-    model_name = "distilbert-base-uncased-finetuned-sst-2-english"
-    sentiment_analysis = pipeline("sentiment-analysis", model=model_name)
-    results = sentiment_analysis(text)
-    sentiment_label = results[0]['label']
-    sentiment_score = results[0]['score']
-    return sentiment_label, sentiment_score
-
-def transcribe_audio(audio_file_path):
-    r = sr.Recognizer()
-    with sr.AudioFile(audio_file_path) as source:
-        audio = r.record(source)
-        transcribed_text = r.recognize_google(audio)
-    return transcribed_text
+    raise Exception("Max retries reached. Unable to transcribe audio.")
 
 def main():
     if audio_file and upload_button:
         try:
-            # Save uploaded file temporarily to disk
             temp_audio_path = "temp_audio.wav"
             with open(temp_audio_path, "wb") as f:
                 f.write(audio_file.read())
 
-            transcribed_text = transcribe_audio(temp_audio_path)
+            transcribed_text = transcribe_audio_with_retry(temp_audio_path)
             sentiment_label, sentiment_score = perform_sentiment_analysis(transcribed_text)
 
             st.header("Transcribed Text")
             st.text_area("Transcribed Text", transcribed_text, height=200)
             st.header("Sentiment Analysis")
-            negative_icon = "👎"
-            neutral_icon = "😐"
-            positive_icon = "👍"
-
-            if sentiment_label == "NEGATIVE":
-                st.write(f"{negative_icon} Negative (Score: {sentiment_score})", unsafe_allow_html=True)
-            else:
-                st.empty()
-
-            if sentiment_label == "NEUTRAL":
-                st.write(f"{neutral_icon} Neutral (Score: {sentiment_score})", unsafe_allow_html=True)
-            else:
-                st.empty()
-
-            if sentiment_label == "POSITIVE":
-                st.write(f"{positive_icon} Positive (Score: {sentiment_score})", unsafe_allow_html=True)
-            else:
-                st.empty()
-
-            st.info(
-                "The sentiment score measures how strongly positive, negative, or neutral the feelings or opinions are."
-                "A higher score indicates a positive sentiment, while a lower score indicates a negative sentiment."
-            )
+            # ... (rest of your code)
 
         except Exception as ex:
             st.error("Error occurred during audio transcription and sentiment analysis.")
@@ -75,7 +34,6 @@ def main():
             traceback.print_exc()
 
         finally:
-            # Remove the temporary file
             os.remove(temp_audio_path)
 
 if __name__ == "__main__":
